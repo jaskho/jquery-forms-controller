@@ -1,7 +1,11 @@
 # Form Controller jQuery Plugin
 
-Provides a framework for presenting interactive forms, with flexible validatation, 
-event management and user messaging.
+Provides a framework for presenting interactive forms, with flexible and extensible 
++ validatation
++ event management 
++ user messaging
+
+
 
 ## Framework Logic
 
@@ -23,20 +27,39 @@ The set of elements can also be restricted, using <code>settings.updateNotSelect
 Note the class <code>"user-action"</code>.  This essentially converts any link with <code>class="user-action"</code> into a button.
 
 
+#Validation Plugin
+FormsController plugin for validation, input masking and error messaging/signalling.
+
+Requires FormsController framework plugin.
+ 
+Extensible configuration API allows for user-defined features such as
++ re-usable validation and input masking rules.
++ regex-based validation rules.
++ regex-based input masks.
++ complex/conditional/multi-element validation (e.g. if field A is empty, fields B, C and D must not be empty)
++ nested validation elements (e.g., if a field is a member of widget on a tab, validation can be
+  applied independently to the field, the widget and/or the tab.)
++ dynamic, fine-grained control of validation code execution (ie. when Tab A is active, don't bother to
+  validate Tab B, but when Tab B is active, validate both Tab A and Tab B.)
++ fine-grained control of error messaging/signalling.
++ custom validation and messaging callbacks.
+
 ##Validation UI API
-Error messages and display specs are declared in config objects, keyed by "field" :
+Error messages and display specs are declared in config objects, keyed by "field":
     formElement.config.fields.{fieldkey}.validation
-(note that in this context a "field" could refer to an html form element or a logical
-compounded of elements).
+Note that in this context a "field" could refer to an html form element or a logical
+compound of elements (such as a widget or grouping of fields).
 
-Validation configuration can be modified at run-time.
+Validation configuration can be modified at run-time to handle dynamic use cases.
 
-### Configuration Object properties:
+### Configuration Object keys:
    +   groups
-         Array of arbitrary labels for grouping fields
+         Array of arbitrary labels for grouping fields. All fiels with <code>foo</code> in
+         their <code>groups</code> array will be validated whenever the group
+         <code>foo</code> is validated.
    +   skip
          If true, field will not be validated
-         This can be set at processing time to allow for contextual processing
+         This can be set at validation time to allow for contextual processing
    +   custom
          If true:
          + field will not be automatically validated, but must be
@@ -46,7 +69,7 @@ Validation configuration can be modified at run-time.
    +   validation
        +   required
              (optional)
-             @TODO-ONSTANCE: document this feature
+             @TODO: document this feature
        +   validation.msg
              + message to be displayed with the field(s)
        +   validation.errorElmSelector:
