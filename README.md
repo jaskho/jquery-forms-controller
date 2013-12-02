@@ -4,11 +4,15 @@ This project consists of three compenents:
 
 1. FormsController - Light-weight, modular application framework, implemented as a jQuery plugin
 
-2. Validation module - Flexible input validation framework, implemented as a jQuery plugin
+2. Validation module - Flexible input validation and feedback framework, implemented as a jQuery plugin
 
 3. FlowTabs widget - jQuery widget for implementing a multi-step process via a tabbed display
 
-Each component can be used independently of the others.  In combination, they allow for the implementation of a complex form as a managed sequence, wizard-style process, using a tabs metaphor to provide user feedback and orientation.
+Together, these allow a complex form to be presented as a managed sequence, wizard-style process, using a tabs metaphor to provide user feedback and orientation.
+
+The FormsController framework implements a pluggable architecture.  The Validation and FlowTabs components are FormsController plugins, and thus are dependent upon FormsController.  However, decoupling one or both into standalone jQuery plugins would be relatively trivial.
+
+
 
 
 # Form Controller jQuery Plugin
@@ -22,7 +26,9 @@ Provides a framework for presenting interactive forms, with flexible and extensi
 
 ## Framework Logic
 
-The FormController centralizes and organizes the processing of user interactions.  By default, actions proceed through these steps, in order:
+The FormController centralizes and organizes the processing of user actions and the application's responses to those actions.  
+
+By default, processing follows these steps, in order:
 + Event capture and delegation: ::refreshForm(). 
 + State Management: ::customOnChange().  All necessary changes to the data (not UI) state are performed.
 + Validation.  ::validateForm().  Evaluates entries per default and custom rules
