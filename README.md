@@ -1,3 +1,13 @@
+# Overview
+
+This project consists of three compenents:
+1. FormsController - Light-weight, modular application framework, implemented as a jQuery plugin
+2. Validation module - Flexible input validation framework, implemented as a jQuery plugin
+3. FlowTabs widget - jQuery widget for implementing a multi-step process via a tabbed display
+
+Each component can be used independently of the others.  In combination, they allow for the implementation of a complex form as a managed sequence, wizard-style process, using a tabs metaphor to provide user feedback and orientation.
+
+
 # Form Controller jQuery Plugin
 
 Provides a framework for presenting interactive forms, with flexible and extensible 
