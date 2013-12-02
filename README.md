@@ -10,7 +10,7 @@ This project is really three projects in one:
 The FormsController and Validation module together provide for a flexible, roughly MVC-style, form-based interface.
 
 
-(3.) FlowTabs widget - jQuery widget for implementing a multi-step process via a tabbed display.
+(3.) FlowTabs module - jQuery widget for implementing a multi-step process via a tabbed display.
 
 Together with the FormsController/Validation module, allows a complex form to be presented as a managed-sequence, wizard-style process, using a tabs metaphor to provide user feedback and orientation.
 
