@@ -1,38 +1,37 @@
 # Overview
 
-This project consists of three compenents:
+This project is really three projects in one:
 
-1. FormsController - Light-weight, modular application framework, implemented as a jQuery plugin
+1. FormsController - Light-weight, modular application framework, implemented as a jQuery plugin.  Provides centralized event handling, state management and display updating, with a pluggable architecture for the integration of additional functional components.
 
-2. Validation module - Flexible input validation and feedback framework, implemented as a jQuery plugin
 
-3. FlowTabs widget - jQuery widget for implementing a multi-step process via a tabbed display
+2. Validation module - Flexible input control, validation and feedback messaging framework, implemented as a FormsController plugin (and, incidentally, as a jQuery plugin).  Supports arbitrarily complex validation and prompting/signaling scenarios (see below).
 
-Together, these allow a complex form to be presented as a managed sequence, wizard-style process, using a tabs metaphor to provide user feedback and orientation.
+The FormsController and Validation module together provide for a flexible, roughly MVC-style, form-based interface.
 
-The FormsController framework implements a pluggable architecture.  The Validation and FlowTabs components are FormsController plugins, and thus are dependent upon FormsController.  However, decoupling one or both into standalone jQuery plugins would be relatively trivial.
+
+3. FlowTabs widget - jQuery widget for implementing a multi-step process via a tabbed display.
+
+Together with the FormsController/Validation module, allows a complex form to be presented as a managed-sequence, wizard-style process, using a tabs metaphor to provide user feedback and orientation.
+
+
+(As an aside, although the Validation and FlowTabs modules have been implemented as FormsController plugins, decoupling one or both into standalone jQuery plugins would be relatively trivial.)
 
 
 
 
 # Form Controller jQuery Plugin
 
-Provides a framework for presenting interactive forms, with flexible and extensible 
-+ validatation
-+ event management 
-+ user messaging
-
-
 
 ## Framework Logic
 
-The FormController centralizes and organizes the processing of user actions and the application's responses to those actions.  
+The FormController centralizes and organizes the processing of user actions and the application's responses to those actions, as delegated to/determined by component modules.  
 
 By default, processing follows these steps, in order:
 + Event capture and delegation: ::refreshForm(). 
-+ State Management: ::customOnChange().  All necessary changes to the data (not UI) state are performed.
-+ Validation.  ::validateForm().  Evaluates entries per default and custom rules
-+ UI Update.  ::updateDynamicElements() & customUpdateUI().  All UI changes are performed here.
++ State Management: ::customOnChange().  Component modules transform model data in response to the event.
++ Validation/business logic.  ::validateForm().  Component modules evaluate new application state and register necessary responses.
++ UI Update.  ::updateDynamicElements() & ::customUpdateUI().  All UI changes are performed here.
 
 ## Event Capturing
 
@@ -41,15 +40,13 @@ FormController's default behavior is to capture the following form events (addre
     change: [ "input" , "select"  ] ,
     click:  [ '[type="button"]' , '.user-action' ]
     
-This can be overridden or extended by client, using <code>settings.updateSelector</code>.
+This can be overridden or extended by component modules, using <code>settings.updateSelector</code>.
 The set of elements can also be restricted, using <code>settings.updateNotSelector</code>.
-Note the class <code>"user-action"</code>.  This essentially converts any link with <code>class="user-action"</code> into a button.
+Note the use of the class attribute <code>"user-action"</code>.  This essentially converts any link with <code>class="user-action"</code> into a button.
 
 
 #Validation Plugin
 FormsController plugin for validation, input masking and error messaging/signalling.
-
-Requires FormsController framework plugin.
  
 Extensible configuration API allows for user-defined features such as
 + re-usable validation and input masking rules.
