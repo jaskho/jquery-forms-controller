@@ -92,6 +92,23 @@ TabFlowController = function( parent, initParams ){
   // parent FormsController object
   this.parent = parent;
 
+  this.state = {};
+
+  // Support jQuery UI versions 1.8, 1.9, 1.10
+  var jquiver = jQuery.ui.version.match('^([0-9]+)\.([0-9]+)(|\.(.*))$');
+  this.state.jquiVersion = null;
+  if(jquiver) {
+    this.state.jquiVersion = {major: jquiver[1], minor: jquiver[2]};
+  }
+  var validVer;
+  validVer = ! (this.state.jquiVersion == null);
+  validVer = (validVer) && this.state.jquiVersion.major == '1';
+  validVer = (validVer) && (jQuery.inArray(this.state.jquiVersion.minor, ['8', '9', '10']) >= 0);
+  if(!validVer) {
+    throw new UserException("flowTabs plugin requires jQuery UI version 1.8, 1.9 or 1.10");
+  } 
+
+
   /**
    * store client initialization parameters
    *   + selector: jQuery selector for tab element
@@ -140,8 +157,16 @@ TabFlowController = function( parent, initParams ){
   // hook FormController::preUpdateUI event
   jQuery( parent ).bind( 'preUpdateUI' , this.preUpdateUI );
 
+  // stash self in elm.data
+  jQuery( selector ).data('flowTabs', this);
+
   // initialize jquery tabs plugin
-  var tabsElm = jQuery( selector ).tabs();
+  if(this.jQueryUIVersion('-1.8')) {
+    var tabsElm = jQuery( selector ).tabs();
+  } else {
+    var tabsElm = jQuery( selector ).tabs({ active: 0 });
+  }
+
   // @TODO-onstance: make this option configurable
   tabsElm.tabs( "option", "fx", { opacity: 'toggle' } ); 
 
@@ -150,14 +175,14 @@ TabFlowController = function( parent, initParams ){
 
   // add handler for tabsshow event (on select tab, manually set 'touched' flag 
   //  which otherwise would never happen).
-  jQuery( selector ).bind( "tabsshow", {tabsController:this} , function(event, ui){
+  jQuery( selector ).bind( "tabsactivate", {tabsController:this} , function(event, ui){
     event.data.tabsController.processTabShow(event, ui); 
   } )
 
   // add validation check to tab selection event
   //  if current tab doesn't validate, return False to prevent change
   //  and keep user on current tab
-  jQuery( selector ).bind('tabsselect', {tabsController:this} , this.processTabSwitch);
+  jQuery( selector ).on('tabsbeforeactivate', {tabsController:this} , this.processTabSwitch);
 
   // client-specified validateNotify event handler
   if( this.params.validateNotify ) {
@@ -182,14 +207,72 @@ TabFlowController = function( parent, initParams ){
   
   // initialize tab states
   this.tabStates = new TabFlowController.TabStates();
-  for( var idx = 1; idx <= tabsElm.tabs('length') ; idx++){
+  var tabsCt = jQuery(tabsElm.data('ui-tabs')._getList().children('li')).length;
+  for( var idx = 1; idx <= tabsCt ; idx++){
 
     var tab = new TabFlowController.Tab();
     this.tabStates[idx] = tab;
 
   } ;
-  
+  this.tabStates[1].enabled = true;
+
 }
+
+/**
+ * Determine if jQuery UI version matches or is within a range
+ * param tag: version number or range.
+ *            Supply BOTH major/minor, and ONLY major minor
+ *            Usage examples: 
+ *             + '1.8'
+ *             + '1.9'
+ *             + '-1.10' (less than or equal to 1.9 (actually, 1.10.99999...))
+ *             + '1.9-' (greater than or equal to 1.9)
+ *             + '1.9-1.10' (greater than or equal to 1.9, and less than or equal to 1.10.999...)
+ */
+TabFlowController.prototype.jQueryUIVersion = function(tag) {
+  var regex = '^(-|)(([0-9]+)\.([0-9]+))(-|)(([0-9]+)\.([0-9]+)|)'
+  var parsedTag = tag.match(regex)   ;    
+  var testVer, lowVer, highVer;
+
+  padDigits = function(number, digits) {
+    return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
+  }
+
+  // Has leading '-', eg. -x.y
+  if(parsedTag[1]) { 
+    lowVer = 0;
+    highVer = parseFloat(parsedTag[3] + '.' + padDigits(parsedTag[4], 4));
+  // Has separating or trailing '-', eg. x1.y1-x2.y2 or x.y-
+  } else if (parsedTag[5]) {
+    lowVer = parseFloat(parsedTag[3] + '.' + padDigits(parsedTag[4], 4));
+    // Has end tag specified
+    if(parsedTag[6]) {
+      highVer = parseFloat(parsedTag[7] + '.' + padDigits(parsedTag[8], 4));
+    // No end tag specified
+    } else {
+      highVer = 99999.9999;
+    }
+  // Is single value
+  } else {
+    lowVer = highVer = parseFloat(parsedTag[3] + '.' + padDigits(parsedTag[4], 4));
+  }
+
+  testVer = parseFloat(this.state.jquiVersion.major + '.' + padDigits(this.state.jquiVersion.minor, 4));
+
+  var isValid = (testVer >= lowVer) && (testVer <= highVer);
+  isValid = isValid && (testVer >= lowVer) && (testVer <= highVer);
+  return isValid;
+}
+
+
+
+
+
+
+
+
+
+
 
 /*
  * Tab state "class" - more a complex data type, really
@@ -376,7 +459,7 @@ TabFlowController.prototype.tabStateObj = function( tabIdx ) {
  * get current tab
  */
 TabFlowController.prototype.currentTab = function() {
-  return jQuery(this.params.selector).tabs( 'option' , 'selected' ) + 1;
+  return jQuery(this.params.selector).tabs( 'option' , 'active' ) + 1;
 }
 
 
@@ -389,11 +472,11 @@ TabFlowController.prototype.updateTabs = function() {
 
   // grab the state objs for efficiency
   var tabState = this.tabStates;
+
   var tabCt = this.tabStates.count();
  
   // get current tab
   var activeTabIdx = this.currentTab();
-   
   // determine enable/disable states (determines if user can (attempt to) navigate to tab)
   //   Data Entry tabs
   for( var tabIdx = 1 ; tabIdx <= tabCt ; tabIdx++ ) {
@@ -413,7 +496,7 @@ TabFlowController.prototype.updateTabs = function() {
       );
     } 
   }
-      
+     
   //   Review tab (assuming all data entry tabs validate)
   var dataTabsValidate = true;
   for( var tabIdx = 1 ; tabIdx < tabCt ; tabIdx ++ ) {
@@ -490,7 +573,7 @@ TabFlowController.prototype.activateTab = function( idx ) {
 
   // tabs('select') will cause the processTabSwitch logic to fire, and
   // the 'select' action will fail if it's not valid.
-  jQuery(this.params.selector).tabs("select" , idx ); 
+  jQuery(this.params.selector).tabs("option", 'active', idx ); 
   jQuery('html').scrollTop(  jQuery(this.params.selector).offset().top  );
   
 }
@@ -501,7 +584,7 @@ TabFlowController.prototype.activateTab = function( idx ) {
  *  (by returning False)
  */
 TabFlowController.prototype.processTabSwitch = function(event, ui) {
-
+console.log({processTabSwitch: [event, ui]});
   // Note: because this is a DOM event handler, the 'this' keyword here
   // points to the DOM element from which the event originated, NOT
   // the parent js 'tabsController' instance.  So, we're passing in

@@ -187,7 +187,7 @@
      * @return undefined
      */
     this.validateForm = function( e, data ) {
-
+console.log('validateForm()');
       // suppress errors while initializing form
       if( this._parent.state.initializing ) {
 
@@ -243,7 +243,8 @@
         }
         return true;
       }
-      
+   console.log('validating ' + fldKey);
+
       // default state to validated = true
       if( ! this.state[ fldKey ] ) this.state[ fldKey ] = {};
       this.state[ fldKey ].validated = true;
@@ -251,6 +252,9 @@
       // get DOM obj 
       var fld = jQuery( '#' + fldConfig.id ); 
       var fldType = fld.attr( 'type' );
+      if(jQuery.ui.version.match('^1\.10(\.|)')) {
+        if (fldType === undefined) fldType = fld.prop('type');
+      }
 
       // check for required
       if( fldConfig.validation.required ) {
@@ -266,6 +270,7 @@
           this.state[ fldKey ].validated = fld.val() !== "";
         } else if ( fldType == 'checkbox' ) {
           this.state[ fldKey ].validated = fld.attr('checked');
+          if(this.state[ fldKey ].validated === undefined) this.state[ fldKey ].validated = false;
         } else if ( fldConfig.type == 'radios' ) {
           this.state[ fldKey ].validated = jQuery('input[name=' + fldConfig.id + ']:checked').length > 0;
         }
@@ -288,7 +293,7 @@
           } 
         }
       }
-   
+   console.log(this.state[fldKey]);
       return this.state[ fldKey ].validated;
       
     }
@@ -487,7 +492,7 @@
      */
     this.updateDisplay = function( fieldMsgs , suppressFormMsg ) {
 
-
+console.log('yyyy');
 
       // set param dflts
       if( fieldMsgs === undefined || fieldMsgs === null ) fieldMsgs = true;
@@ -544,7 +549,7 @@
      *                       groups will be displayed
      */
     this.displayFieldMessages = function( limitToGroups ) {
-
+console.log(this.state);
       // loop in-/validated items
       for( fldKey in this.state ) {
        
