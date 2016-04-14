@@ -10,4 +10,4 @@
 
 + Issue tracking
 
-+ Further de-couple Forms, validation and tabs components
++ Further de-couple Forms, validation and tabs components. Research best practices/design patterns
