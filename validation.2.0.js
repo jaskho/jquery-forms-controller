@@ -243,7 +243,6 @@ console.log('validateForm()');
         }
         return true;
       }
-   console.log('validating ' + fldKey);
 
       // default state to validated = true
       if( ! this.state[ fldKey ] ) this.state[ fldKey ] = {};
@@ -252,9 +251,6 @@ console.log('validateForm()');
       // get DOM obj 
       var fld = jQuery( '#' + fldConfig.id ); 
       var fldType = fld.attr( 'type' );
-      if(jQuery.ui.version.match('^1\.10(\.|)')) {
-        if (fldType === undefined) fldType = fld.prop('type');
-      }
 
       // check for required
       if( fldConfig.validation.required ) {
@@ -293,7 +289,6 @@ console.log('validateForm()');
           } 
         }
       }
-   console.log(this.state[fldKey]);
       return this.state[ fldKey ].validated;
       
     }
@@ -491,8 +486,6 @@ console.log('validateForm()');
      *                       #  showGroups is set.
      */
     this.updateDisplay = function( fieldMsgs , suppressFormMsg ) {
-
-console.log('yyyy');
 
       // set param dflts
       if( fieldMsgs === undefined || fieldMsgs === null ) fieldMsgs = true;
