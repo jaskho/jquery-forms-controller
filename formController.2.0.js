@@ -152,6 +152,10 @@ if (!window.console) console = {log: function() {}};
    */
   FormController.prototype.refreshForm = function ( e ){
 
+    // Cache a reference to event.
+    // @TODO: Consider: is this reliable? Is there a more sensible way to handle?
+    this.state.lastEvent = e;
+
     // if form has been submitted, note this 
     if ( e && ( e.type == 'submit' && jQuery(e.currentTarget).is(this.formSettings.formSelector ) ) ) {
       this.state.form_submitted = true;
