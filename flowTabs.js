@@ -92,6 +92,30 @@ TabFlowController = function( parent, initParams ){
   // parent FormsController object
   this.parent = parent;
 
+  /**
+   * "Define" custom events (for manageability and documentation purposes).
+   */
+  this.events = {
+
+    /**
+     * Give notice of pending tab switch. This is used to allow widgets
+     * to have validation logic that distinguishes if the runtime context
+     * is the result of a tab switch.
+     */
+    'beforeTabSwitch': 'beforeTabSwitch.tabflow',
+
+    'validatenotify': 'validatenotify.tabflow',
+
+    'tabswitchfailed': 'tabswitchfailed.tabflow',
+
+    /** 
+     * Give notice that (new) tab is about to be displayed, allowing
+     * components/widgets to update form if necessary.
+     */
+     'tabpreshow': 'tabpreshow.tabflow'
+
+  };
+
   this.state = {};
 
   // Support jQuery UI versions 1.8, 1.9, 1.10
@@ -185,6 +209,9 @@ TabFlowController = function( parent, initParams ){
   jQuery( selector ).on('tabsbeforeactivate', {tabsController:this} , this.processTabSwitch);
 
   // client-specified validateNotify event handler
+  // @TODO: what's the point of using an event listener here? The 
+  // validateNotify event may have some /other/ usefulness, but there's no 
+  // reason not to have this.params.validateNotify be a simple callback function.
   if( this.params.validateNotify ) {
     jQuery( selector ).bind('validatenotify.tabflow', this.params.validateNotify );
   }
@@ -605,7 +632,8 @@ console.log({processTabSwitch: [event, ui]});
   
   // raise validatenotify event so client form can update validation
   // states
-  jQuery(_this.params.selector).trigger('validatenotify.tabflow');
+  jQuery(_this.params.selector).trigger('beforetabswitch.tabflow');
+  // jQuery(_this.params.selector).trigger('validatenotify.tabflow');
   
   // if errors on tab, notify client and disallow tab change
   if( ! _this.tabStateObj( curTab ).validated ) {
