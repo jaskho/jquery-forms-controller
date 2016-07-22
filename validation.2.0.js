@@ -40,7 +40,7 @@
       scrollToFormMsg: false ,
       interceptSubmission: true ,
       validators: {} ,
-			debug: false
+      debug: false
     };
 
     jQuery.extend( true , this.config , config );
@@ -188,7 +188,7 @@
      * @return undefined
      */
     this.validateForm = function( e, data ) {
-			if(this.config.debug) {console.log('validateForm()');}
+      if(this.config.debug) {console.log('validateForm()');}
       // suppress errors while initializing form
       if( this._parent.state.initializing ) {
 
@@ -848,13 +848,13 @@
       data.formController.state.hasError = this.hasError();
     }
 
-		this.debugValidationState = function() {
-			console.group('Validation State');
-			for (prop in this.state) { 
-				console.log(prop + ': ' + this.state[prop].validated) 
-			}
-			console.groupEnd();
-		}
+    this.debugValidationState = function() {
+      console.group('Validation State');
+      for (prop in this.state) { 
+        console.log(prop + ': ' + this.state[prop].validated) 
+      }
+      console.groupEnd();
+    }
 
     // register check-validation event listener
     jQuery(this._parent).bind( 'checkValidation' ,  jQuery.proxy( this.checkValidation , this ) );
