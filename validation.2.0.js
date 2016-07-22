@@ -39,7 +39,8 @@
       formMessageFlashColor: '#ff9' ,
       scrollToFormMsg: false ,
       interceptSubmission: true ,
-      validators: {} 
+      validators: {} ,
+			debug: false
     };
 
     jQuery.extend( true , this.config , config );
@@ -187,7 +188,7 @@
      * @return undefined
      */
     this.validateForm = function( e, data ) {
-console.log('validateForm()');
+			if(this.config.debug) {console.log('validateForm()');}
       // suppress errors while initializing form
       if( this._parent.state.initializing ) {
 
@@ -350,7 +351,7 @@ console.log('validateForm()');
      */
     this.validateGroup = function( groupKey , applyDefaults ) {
     
-   //    if ( ! applyDefaults ) applyDefaults = false;
+      //    if ( ! applyDefaults ) applyDefaults = false;
       
       if( ! applyDefaults && this.config.validators.groups[groupKey] ){
         return this.config.validators.groups[groupKey]( this );
@@ -542,7 +543,6 @@ console.log('validateForm()');
      *                       groups will be displayed
      */
     this.displayFieldMessages = function( limitToGroups ) {
-console.log(this.state);
       // loop in-/validated items
       for( fldKey in this.state ) {
        
@@ -847,6 +847,14 @@ console.log(this.state);
         // debugger;
       data.formController.state.hasError = this.hasError();
     }
+
+		this.debugValidationState = function() {
+			console.group('Validation State');
+			for (prop in this.state) { 
+				console.log(prop + ': ' + this.state[prop].validated) 
+			}
+			console.groupEnd();
+		}
 
     // register check-validation event listener
     jQuery(this._parent).bind( 'checkValidation' ,  jQuery.proxy( this.checkValidation , this ) );
