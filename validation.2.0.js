@@ -353,25 +353,26 @@
     
       //    if ( ! applyDefaults ) applyDefaults = false;
       
+			// Don't recurse when applying default validation logic.
       if( ! applyDefaults && this.config.validators.groups[groupKey] ){
         return this.config.validators.groups[groupKey]( this );
       }
 
       var hasError = false;
       
+			// Get the fields associated with this group.
       var flds = this.getGroupFields( groupKey );
 
+			// Loop fields in this group.
       for( var fldKey in flds ) {
         var fld = flds[ fldKey ] ;
-        if( jQuery.inArray( groupKey , fld.groups ) != -1) {
-          // special handling for custom items
-          if( fld.custom ) {
-            var rslt = this.state[ fldKey ].validated;
-          } else {
-            rslt = this.validateField( fldKey );
-          }
-          if( ! rslt ) hasError = true;
-        }
+				// special handling for custom items
+				if( fld.custom ) {
+					var rslt = this.state[ fldKey ].validated;
+				} else {
+					rslt = this.validateField( fldKey );
+				}
+				if( ! rslt ) hasError = true;
       }
       
       return ! hasError;
